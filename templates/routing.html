@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bicycle Routing in Melbourne</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            #map {
+                height: calc(100vh - 56px);
+                width: 100%;
+                position: relative; /* Ensure the map container is relative for absolute positioning */
+            }
+            .chart-container {
+                position: absolute;
+                top: 60px; /* Positioning from the top */
+                right: 30px; /* Positioning from the right */
+                background: white; /* Background color for visibility */
+                border-radius: 5px; /* Rounded corners */
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Shadow for visibility */
+                padding: 5px; /* Reduced padding */
+                width: 300px; /* Fixed width */
+                height: 150px; /* Fixed height */
+                display: none; /* Initially hidden */
+                z-index: 1000; /* Ensure it is on top */
+                overflow: hidden; /* Hide overflow */
+            }
+            .container-fluid {
+                height: 100%; /* Ensure container takes full height */
+                display: flex;
+            }
+            #left-panel {
+                height: calc(100vh - 56px); /* Match the height of the map */
+                overflow-y: auto; /* Enable vertical scrolling */
+            }
+            .autocomplete-suggestions {
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: #fff;
+                max-height: 150px;
+                overflow-y: auto;
+                position: absolute;
+                z-index: 1000;
+                width: calc(100% - 2rem);
+                margin: 0.5rem;
+            }
+            .autocomplete-suggestion {
+                padding: 0.5rem;
+                cursor: pointer;
+            }
+            .autocomplete-suggestion:hover {
+                background: #f0f0f0;
+            }
+            #instructions {
+                margin-top: 20px;
+                display: none;
+            }
+            #instructions-list {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+            #instructions-list li {
+                display: flex;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid #ddd;
+                
+            }
+            .instruction-icon {
+                width: 24px;
+                height: 24px;
+                margin-right: 10px;
+                font-size: 24px;
+                color: #333;
+            }
+            .instruction-text {
+                font-size: 14px;
+                color: #555;
+            }
+
+            .custom-icon {
+                background-color: rgb(255, 204, 0);
+                border-radius: 50%;
+                border: 2px solid #ffd700; 
+                width: 40px; 
+                height: 40px; 
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 0 5px rgba(255, 204, 0, 1);
+                font-size: 40px;
+            }
+
+            .custom-icon i {
+                color: white; 
+                margin: 0;
+            }
+            .navbar .nav-item .nav-link {
+              color: #FAEBEF; /* Original color */
+              transition: color 0.3s ease; /* Smooth transition effect */
+            }
+
+            .navbar .nav-item .nav-link:hover {
+              color: #F5A623; /* A warm, contrasting color for hover */
+            }
+            .spinner {
+                border: 4px solid rgba(0,0,0,0.1);
+                border-left: 4px solid #3498db;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+                margin: auto;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    </head>
+    <body>
+          <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #333D79;">
+            <a class="navbar-brand" style='color:#FAEBEF;' href="/">CycleGuard</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item ">
+                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/routing">Routing</a>
+                </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="/dashboard">Accidents Stats</a>
+                    </li>
+              </ul>
+            </div>
+          </nav>
+
+        <div class="container-fluid">
+            <div class="col-md-3 bg-light p-3 border-right position-relative" id="left-panel">
+                <h4>Bicycle Routing</h4>
+                <form id="route-form">
+                    <div class="mb-3">
+                        <label for="origin" class="form-label">Origin</label>
+                        <input type="text" class="form-control" id="origin" name="origin" required>
+                        <div id="origin-suggestions" class="autocomplete-suggestions"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="destination" class="form-label">Destination</label>
+                        <input type="text" class="form-control" id="destination" name="destination" required>
+                        <div id="destination-suggestions" class="autocomplete-suggestions"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Find Route</button>
+                </form>
+                <div id="loading" style="display:none;">
+                    <!-- CSS spinner -->
+                    <div class="spinner"></div>
+                </div>
+
+                <div id="instructions">
+                    <h5>Directions</h5>
+                    <ul id="instructions-list"></ul>
+                </div>
+            </div>
+            <div class="col-md-9 p-0" id="map"></div>
+            <div class="chart-container">
+                <canvas id="elevationChart" width="800" height="400"></canvas>
+            </div>
+        </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <!-- Leaflet Control Geocoder -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+        const map = L.map('map').setView([-37.8136, 144.9631], 13); // Centered on Melbourne
+
+        L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+            attribution: '© CycleOSM contributors'
+        }).addTo(map);
+
+        // Fetch the data
+        fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(location => {
+                // Create a custom icon
+                var warningSVG = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path d="M1 21h22L12 2 1 21zm11-2h-2v-2h2v2zm0-4h-2V7h2v8z"/>
+                    </svg>
+                `;
+
+                // Create a custom icon using SVG
+                var yellowIcon = L.divIcon({
+                    className: 'custom-icon',
+                    html: warningSVG
+                });
+
+                // Create a marker with the custom icon
+                var marker = L.marker([location.lat, location.lon], { icon: yellowIcon }).addTo(map);
+
+                // Bind a popup to the marker
+                marker.bindPopup(`<b>${location.name}</b><br>${location.message}`);
+
+                // Create a circle with a 1 km radius
+                var radiusCircle = L.circle([location.lat, location.lon], {
+                    radius: 500, // 1 km in meters
+                    color: 'red',
+                    weight: 1,
+                    opacity: 0.5,
+                    fillOpacity: 0.2
+                }).addTo(map);
+
+                // Initially hide the circle
+                radiusCircle.setStyle({ opacity: 0, fillOpacity: 0 });
+
+                // Function to control circle visibility based on zoom level
+                function updateCircleVisibility() {
+                    if (map.getZoom() >= 14) {
+                        radiusCircle.setStyle({ opacity: 0.5, fillOpacity: 0.2 });
+                    } else {
+                        radiusCircle.setStyle({ opacity: 0, fillOpacity: 0 });
+                    }
+                }
+
+                // Call the function on map zoom level change
+                map.on('zoomend', updateCircleVisibility);
+
+                // Initial check
+                updateCircleVisibility();
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+        let originMarker, destinationMarker;
+        let debounceTimeout;
+
+        // Define custom icons for origin and destination
+        const originIcon = L.divIcon({
+            className: 'leaflet-div-icon',
+            html: '<i class="material-icons" style="color: green; font-size: 30px;">place</i>'
+        });
+
+        const destinationIcon = L.divIcon({
+            className: 'leaflet-div-icon',
+            html: '<i class="material-icons" style="color: red; font-size: 30px;">location_on</i>'
+        });
+
+        // Function to fetch and display autocomplete suggestions
+        async function getSuggestions(query, inputId, suggestionsId) {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(async () => {
+                if (query.trim() === '') {
+                    document.getElementById(suggestionsId).innerHTML = '';
+                    return;
+                }
+                const response = await fetch(`/autocomplete?text=${query}`);
+                const data = await response.json();
+
+                const suggestions = data.features.map(feature => ({
+                    text: feature.properties.formatted,
+                    lat: feature.geometry.coordinates[1],
+                    lon: feature.geometry.coordinates[0]
+                }));
+
+                const suggestionList = suggestions.map(suggestion => 
+                    `<div class="autocomplete-suggestion" data-lat="${suggestion.lat}" data-lon="${suggestion.lon}">${suggestion.text}</div>`
+                ).join('');
+
+                document.getElementById(suggestionsId).innerHTML = suggestionList;
+
+                document.querySelectorAll(`#${suggestionsId} .autocomplete-suggestion`).forEach(item => {
+                    item.addEventListener('click', () => {
+                        const lat = item.getAttribute('data-lat');
+                        const lon = item.getAttribute('data-lon');
+                        document.getElementById(inputId).value = item.textContent;
+                        document.getElementById(suggestionsId).innerHTML = '';
+                        updateMarkerAndView(inputId, lat, lon);
+                    });
+                });
+            }, 300); // Debounce for 300ms
+        }
+
+        // Function to update marker and view based on inputId and coordinates
+        function updateMarkerAndView(inputId, lat, lon) {
+            if (inputId === 'origin') {
+                if (originMarker) map.removeLayer(originMarker);
+                originMarker = L.marker([lat, lon], { icon: originIcon }).addTo(map);
+                map.setView([lat, lon], 13);
+            } else {
+                if (destinationMarker) map.removeLayer(destinationMarker);
+                destinationMarker = L.marker([lat, lon], { icon: destinationIcon }).addTo(map);
+                map.setView([lat, lon], 13);
+            }
+        }
+        function plotElevationChart(elevationData) {
+            const ctx = document.getElementById('elevationChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: elevationData.labels,
+                    datasets: [{
+                        label: 'Elevation Profile',
+                        data: elevationData.data,
+                        fill: true,
+                        borderColor: '#66ccff',
+                        backgroundColor: '#66ccff66',
+                        tension: 0.1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: (tooltipItems) => `Distance: ${tooltipItems[0].label}m`,
+                                label: (tooltipItem) => `Elevation: ${tooltipItem.raw}m`
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Elevation Profile (Distance vs Elevation)'
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Distance (m)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Elevation (m)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to handle map clicks
+        async function handleMapClick(e) {
+            const lat = e.latlng.lat;
+            const lon = e.latlng.lng;
+            const address = await reverseGeocode(lat, lon);
+
+            if (!originMarker) {
+                originMarker = L.marker(e.latlng, { icon: originIcon }).addTo(map);
+                document.getElementById('origin').value = address;
+            } else if (!destinationMarker) {
+                destinationMarker = L.marker(e.latlng, { icon: destinationIcon }).addTo(map);
+                document.getElementById('destination').value = address;
+            }
+        }
+
+        // Function to handle form submission
+        document.getElementById('route-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Show the loading spinner
+            document.getElementById('loading').style.display = 'block';
+
+            const origin = document.getElementById('origin').value;
+            const destination = document.getElementById('destination').value;
+
+            try {
+                const start = await getCoordinates(origin);
+                const end = await getCoordinates(destination);
+
+                plotRoute(start.lat, start.lon, end.lat, end.lon);
+            } catch (error) {
+                console.error('Error plotting route:', error);
+            } finally {
+                // Hide the loading spinner
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+        var instructionsDiv = document.getElementById('instructions');
+        instructionsDiv.style.display = 'none';
+
+        // Function to plot the route on the map and display instructions
+        async function plotRoute(startLat, startLon, endLat, endLon) {
+            fetch(`/route?start_lat=${startLat}&start_lon=${startLon}&end_lat=${endLat}&end_lon=${endLon}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Convert the coordinates from [lon, lat] to [lat, lon]
+                    var latLngs = data.coordinates.map(coord => [coord[1], coord[0]]);
+
+                    // Clear previous route and instructions
+                    map.eachLayer(layer => {
+                        if (layer instanceof L.Polyline) {
+                            map.removeLayer(layer);
+                        }
+                    });
+                    document.getElementById('instructions-list').innerHTML = '';
+
+                    // Add a polyline for the route
+                    L.polyline(latLngs, {color: 'red'}).addTo(map);
+
+                    // Display instructions
+                    var instructionsList = document.getElementById('instructions-list');
+                    data.instructions.forEach(instruction => {
+                        var li = document.createElement('li');
+
+                        // Determine icon based on instruction type
+                        var icon = '';
+                        if (instruction.toLowerCase().includes('turn left')) {
+                            icon = '↪️';
+                        } else if (instruction.toLowerCase().includes('turn right')) {
+                            icon = '↩️';
+                        } else if (instruction.toLowerCase().includes('bear left')) {
+                            icon = '↙️';
+                        } else if (instruction.toLowerCase().includes('bear right')) {
+                            icon = '↘️';
+                        } else if (instruction.toLowerCase().includes('continue')) {
+                            icon = '➡️';
+                        } else if (instruction.toLowerCase().includes('roundabout')) {
+                            icon = '🔄';
+                        } else {
+                            icon = '🔸';
+                        }
+
+                        li.innerHTML = `<span class="instruction-icon">${icon}</span><span class="instruction-text">${instruction}</span>`;
+                        instructionsList.appendChild(li);
+                    });
+                    // Show the instructions div
+                    instructionsDiv.style.display = 'block';
+
+                    // Adjust the map view to fit the route
+                    map.fitBounds(latLngs);
+                    // Show the chart container and plot the elevation profile
+                    document.querySelector('.chart-container').style.display = 'block';
+                    plotElevationChart(data.elevations);
+                })
+                .catch(error => console.error('Error fetching route:', error));
+        }
+
+        // Function to reverse geocode coordinates
+        async function reverseGeocode(lat, lon) {
+            const response = await fetch(`/reverse-geocode?lat=${lat}&lon=${lon}`);
+            const data = await response.json();
+
+            if (data.features && data.features.length > 0) {
+                return data.features[0].properties.address_line2 || 'Unknown location';
+            } else {
+                return 'Unknown location';
+            }
+        }
+
+        // Function to get coordinates for an address
+        async function getCoordinates(address) {
+            const response = await fetch(`/autocomplete?text=${address}`);
+            const data = await response.json();
+            const coords = data.features[0].geometry.coordinates;
+            return { lat: coords[1], lon: coords[0] };
+        }
+
+        // Event listeners for input fields
+        document.getElementById('origin').addEventListener('input', (e) => {
+            getSuggestions(e.target.value, 'origin', 'origin-suggestions');
+        });
+
+        document.getElementById('destination').addEventListener('input', (e) => {
+            getSuggestions(e.target.value, 'destination', 'destination-suggestions');
+        });
+
+        // Event listener for map clicks
+        map.on('click', handleMapClick);
+    </script>
+
+</body>
+</html>

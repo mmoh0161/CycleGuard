@@ -1,0 +1,144 @@
+{
+  "locations": [
+    {
+      "type": "road",
+      "name": "Mount Alexander Rd (Essendon, Moonee Ponds, Ascot Vale)",
+      "lat": -37.7666,
+      "lon": 144.9045,
+      "message": "Several confusing roundabouts, dangerous for pedestrians attempting to cross and lack of safe bike riding infrastructure."
+    },
+    {
+      "type": "road",
+      "name": "Dandenong Rd (Windsor, Prahran, Caulfield)",
+      "lat": -37.8554,
+      "lon": 145.0322,
+      "message": "Pedestrian crossings inadequate for school children, inappropriate clearway times causing risky merging and sudden drops in speed not well observed."
+    },
+    {
+      "type": "road",
+      "name": "Sydney Rd (Brunswick, Coburg)",
+      "lat": -37.7585,
+      "lon": 144.9555,
+      "message": "Unsafe interaction between motorists, cyclists, pedestrians and trams."
+    },
+    {
+      "type": "road",
+      "name": "North Rd (McKinnon, Oakleigh, Clayton)",
+      "lat": -37.8892,
+      "lon": 145.1041,
+      "message": "Speed zone inconsistency, unsafe driving and disconnected cycling path."
+    },
+    {
+      "type": "road",
+      "name": "Calder Fwy (Keilor Park, Keilor, Taylors Lakes)",
+      "lat": -37.7202,
+      "lon": 144.8374,
+      "message": "Unsafe driving, with heavy congestion inducing risk-taking behaviours."
+    },
+    {
+      "type": "road",
+      "name": "Clyde Rd/Berwick – Cranbourne Rd (Berwick, Clyde)",
+      "lat": -38.0372,
+      "lon": 145.3158,
+      "message": "Unsafe driving, with heavy congestion inducing risk-taking behaviours. Insufficient separation of cyclists."
+    },
+    {
+      "type": "road",
+      "name": "Point Cook Rd (Point Cook, Seabrook)",
+      "lat": -37.8886,
+      "lon": 144.7561,
+      "message": "Unsafe driving, with heavy congestion inducing risk-taking behaviours. Insufficient separation of cyclists."
+    },
+    {
+      "type": "road",
+      "name": "St Kilda Rd (Melbourne)",
+      "lat": -37.8234,
+      "lon": 144.9756,
+      "message": "Motorists and cyclists experiencing confusion since the cycling infrastructure upgrades. Further awareness and education required to mitigate this perception issue."
+    },
+    {
+      "type": "road",
+      "name": "Barkly St/Hopkins St (Footscray)",
+      "lat": -37.7988,
+      "lon": 144.9018,
+      "message": "Inadequate or missing bike infrastructure, narrow footpaths and heavy trucks mixing with bike riders."
+    },
+    {
+      "type": "road",
+      "name": "Western Fwy (Melton, Rockbank)",
+      "lat": -37.6801,
+      "lon": 144.6160,
+      "message": "Two lanes insufficient to service major growth area/absence of adequate merging lanes and overall road quality insufficient for demand."
+    },
+    {
+      "type": "intersection",
+      "name": "Mount Alexander Rd/Keilor Rd (Essendon)",
+      "lat": -37.7674,
+      "lon": 144.9002,
+      "message": "Nightmare intersection. Even locals struggle with all the ins and outs let alone drivers unfamiliar with the area."
+    },
+    {
+      "type": "intersection",
+      "name": "Princes Fwy/Geelong Rd Exit (Werribee)",
+      "lat": -37.8972,
+      "lon": 144.7113,
+      "message": "Cars exiting the freeway westbound have to queue up for kilometres in the emergency lane to exit here. Very unsafe with trucks hurtling past at 100km per hour."
+    },
+    {
+      "type": "intersection",
+      "name": "Wellington Rd/Dorning Rd (Narre Warren East)",
+      "lat": -38.0224,
+      "lon": 145.2702,
+      "message": "Corner of Wellington Road and Dorning Road is unsafe due to the low visibility bend and a 100km/h speed limit and no turning lane into the childcare centre."
+    },
+    {
+      "type": "intersection",
+      "name": "Bay St/Liardet Rd (Port Melbourne)",
+      "lat": -37.8214,
+      "lon": 144.9491,
+      "message": "This intersection is the most hated intersection in Port Melbourne. Although the data only shows collisions reported, near misses happen every day for pedestrians, cyclists and cars. It really needs a better solution."
+    },
+    {
+      "type": "intersection",
+      "name": "Twickenham Cr/Loyola Gr (Richmond)",
+      "lat": -37.8267,
+      "lon": 144.9941,
+      "message": "Roundabout at Twickenham and Loyola. Near misses every time I use the roundabout."
+    },
+    {
+      "type": "intersection",
+      "name": "Flemington Rd/Racecourse Rd (North Melbourne)",
+      "lat": -37.8032,
+      "lon": 144.9393,
+      "message": "One right turning lane (towards the Tulla) here is simply not sufficient. It causes lots of banked up traffic and congestion, leading to frustration and people changing lanes etc."
+    },
+    {
+      "type": "intersection",
+      "name": "Point Cook Rd/Sneydes Rd (Point Cook)",
+      "lat": -37.8979,
+      "lon": 144.7590,
+      "message": "There is an accident or a near miss on this corner every single week without failure. Why are we waiting for a fatality before any action is taken. Lights are needed ASAP and a red light camera at that."
+    },
+    {
+      "type": "intersection",
+      "name": "Flemington Rd/Royal Parade (North Melbourne)",
+      "lat": -37.8024,
+      "lon": 144.9635,
+      "message": "This roundabout regularly confuses motorists, which is amplified by the fact it also has a tram line through it and it used by people unfamiliar with the area (as it is right by Royal Melbourne Hospital)."
+    },
+    {
+      "type": "intersection",
+      "name": "Lorimer St/Wurundjeri Way (Docklands)",
+      "lat": -37.8174,
+      "lon": 144.9415,
+      "message": "Cars in lane 2 travelling on Montague Street towards the city are always moving into lane 1 due to poor lane markings. I travel this intersection daily and I see cars doing this daily."
+    },
+    {
+      "type": "intersection",
+      "name": "Williamstown Rd/Beacon Rd (Port Melbourne)",
+      "lat": -37.8219,
+      "lon": 144.9253,
+      "message": "Child safety is a serious concern here with 100s of kids crossing to use the sporting grounds. There are no parking facilities inside this area, so everyone crosses this busy road which is 60km. Desperately need a traffic light/pedestrian crossing or an elevated crossing."
+    }
+  ]
+}
