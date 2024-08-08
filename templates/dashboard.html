@@ -21,7 +21,7 @@
                 display: flex;
                 flex-direction: column;
             }
-            #map {
+            .map {
                 height: calc(100vh - 56px); /* Corrected height */
                 width: 100%;
                 position: relative; /* Ensure the map container is relative for absolute positioning */
@@ -134,11 +134,12 @@
             }
 
             .test{
-                margin: 0;
+                margin: 20px;
                 color: #333D79;            
                 font-family: sans-serif;
                 font-size: 25px;
                 text-align:center;
+                font-weight: 600;
                 text-transform: capitalize;
             }
 
@@ -170,7 +171,10 @@
           </nav>
 
     <h1 class="test">Victorian Road Crash Data Map</h1>
-         <div id="map"></div>
+
+        <!-- <iframe src="https://app.powerbi.com/reportEmbed?reportId=bab544ff-878b-4cad-8484-deefa8383e77&autoAuth=true&ctid=ef7a487a-77ca-410a-803d-e426b62a587f" title="description" height="600px" width="600px" style="border:none;"></iframe> -->
+
+        <iframe title="build3" width="1140" height="1140" src="https://app.powerbi.com/reportEmbed?reportId=bab544ff-878b-4cad-8484-deefa8383e77&autoAuth=true&ctid=ef7a487a-77ca-410a-803d-e426b62a587f" frameborder="0" allowFullScreen="true" class="map"></iframe>
    
 
     <script>
